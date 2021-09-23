@@ -40,8 +40,17 @@ local function gen_vertices(player, width, height, desaturation)
 		local LastSecond = Song:GetLastSecond()
 
 		-- magic numbers obtained from Photoshop's Eyedrop tool in rgba percentage form (0 to 1)
-		local blue   = {0,    0.678, 0.753, 1}
-		local purple = {0.51, 0,     0.631, 1}
+		local blue   	= {0,		0.678,	0.753,	1}
+		local purple 	= {0.51,	0,		0.631,	1}
+		local 4th		= {0.919,	0.012,	0.124,	1}
+		local 8th 		= {0,		0.218,	1,		1}
+		local 12th 		= {0.499,	0.156,	1,		1}
+		local 16th 		= {0,		0.653,	0.38,	1}
+		local 24th		= 12th
+		local 32nd 		= {0.938,	0.501,	0,		1}
+		local 48th		= 12th
+		local 64th		= {0,		0.731,	0.755,	1}
+		local more 		= 12th
 
 		if desaturation ~= nil then
 			local function Desaturate(color, desaturation)
@@ -56,6 +65,9 @@ local function gen_vertices(player, width, height, desaturation)
 		end
 
 		local upper
+
+		if colorgraph == 1 then
+			PeakSubdivision = 
 
 		for i, nps in ipairs(NPSperMeasure) do
 
@@ -79,16 +91,18 @@ local function gen_vertices(player, width, height, desaturation)
 					verts[#verts][1][1] = x
 					verts[#verts-1][1][1] = x
 				else
+					verts[#verts+1] = {{x, 0, 0}, 4th} -- bottom of graph
+
 					-- lerp_color() is a global function defined by the SM engine that takes three arguments:
 					--    a float between [0,1]
 					--    color1
 					--    color2
 					-- and returns a color that has been linearly interpolated by that percent between the two colors provided
 					-- for example, lerp_color(0.5, yellow, orange) will return the color that is halfway between yellow and orange
-					upper = lerp_color(math.abs(y/height), blue, purple )
+					--[[ upper = lerp_color(math.abs(y/height), blue, purple )
 
 					verts[#verts+1] = {{x, 0, 0}, blue} -- bottom of graph (blue)
-					verts[#verts+1] = {{x, y, 0}, upper}  -- top of graph (somewhere between blue and purple)
+					verts[#verts+1] = {{x, y, 0}, upper}  -- top of graph (somewhere between blue and purple) ]]
 				end
 			end
 		end
