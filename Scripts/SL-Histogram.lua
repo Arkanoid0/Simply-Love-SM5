@@ -34,7 +34,7 @@ local function gen_vertices(player, width, height, desaturation)
 	local verts = {}
 	local x, y, t
 
-	if (PeakNPS and NPSperMeasure and #NPSperMeasure > 1) then
+	if (PeakNPS and NPSperMeasure and #NPSperMeasure and PeakSubdiv > 1) then
 		local TimingData = Steps:GetTimingData()
 		local FirstSecond = math.min(TimingData:GetElapsedTimeFromBeat(0), 0)
 		local LastSecond = Song:GetLastSecond()
@@ -42,6 +42,7 @@ local function gen_vertices(player, width, height, desaturation)
 		-- magic numbers obtained from Photoshop's Eyedrop tool in rgba percentage form (0 to 1)
 		local blue   	= {0,		0.678,	0.753,	1}
 		local purple 	= {0.51,	0,		0.631,	1}
+		-- This is really ugly, find a better way to do this
 		local 4th		= {0.919,	0.012,	0.124,	1}
 		local 8th 		= {0,		0.218,	1,		1}
 		local 12th 		= {0.499,	0.156,	1,		1}
@@ -51,7 +52,7 @@ local function gen_vertices(player, width, height, desaturation)
 		local 48th		= 12th
 		local 64th		= {0,		0.731,	0.755,	1}
 		local more 		= 12th
-
+		local divc 		= {4th, 8th, 12th, 16th, 24th, 32nd, 48th, 64th, more}
 		if desaturation ~= nil then
 			local function Desaturate(color, desaturation)
 				local luma = 0.3 * color[1] + 0.59 * color[2] + 0.11 * color[3]
@@ -65,9 +66,11 @@ local function gen_vertices(player, width, height, desaturation)
 		end
 
 		local upper
+		local bottom
+		local PSD
+		local colorgraph = 1
 
-		if colorgraph == 1 then
-			PeakSubdivision = 
+
 
 		for i, nps in ipairs(NPSperMeasure) do
 
@@ -91,18 +94,23 @@ local function gen_vertices(player, width, height, desaturation)
 					verts[#verts][1][1] = x
 					verts[#verts-1][1][1] = x
 				else
-					verts[#verts+1] = {{x, 0, 0}, 4th} -- bottom of graph
-
+					if colorgraph == 1 then
+						PSD = (PeakSubdiv/4)
+						upper = divc[PSD]
+						bottom = 4th
+					else
+						upper = lerp_color(math.abs(y/height), blue, purple )
+						bottom = blue
+					end
+					verts[#verts+1] = {{x, 0, 0}, bottom} -- bottom of graph
+					verts[#verts+1] = {{x, y, 0}, upper} -- top of graph
 					-- lerp_color() is a global function defined by the SM engine that takes three arguments:
 					--    a float between [0,1]
 					--    color1
 					--    color2
 					-- and returns a color that has been linearly interpolated by that percent between the two colors provided
 					-- for example, lerp_color(0.5, yellow, orange) will return the color that is halfway between yellow and orange
-					--[[ upper = lerp_color(math.abs(y/height), blue, purple )
 
-					verts[#verts+1] = {{x, 0, 0}, blue} -- bottom of graph (blue)
-					verts[#verts+1] = {{x, y, 0}, upper}  -- top of graph (somewhere between blue and purple) ]]
 				end
 			end
 		end

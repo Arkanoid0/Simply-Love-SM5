@@ -280,7 +280,7 @@ local GetMeasureInfo = function(Steps, chartString)
 
 	-- NPS and Density Graph Variables
 	local NPSperMeasure = {}
-	local NPSForThisMeasure, peakNPS = 0, 0
+	local NPSForThisMeasure, peakNPS, PeakSubdiv = 0, 0, 0
 	local timingData = Steps:GetTimingData()
 
 	-- Loop through each line in our string of measures, trimming potential leading whitespace (thanks, TLOES/Mirage Garden)
@@ -316,6 +316,11 @@ local GetMeasureInfo = function(Steps, chartString)
 				peakNPS = NPSForThisMeasure
 			end
 
+			-- determine whether this measure contained the PeakSubdiv
+			if notesInMeasure > PeakSubdiv then
+				PeakSubdiv = notesInMeasure
+			end
+
 			-- Reset iterative variables
 			notesInMeasure = 0
 			measureCount = measureCount + 1
@@ -327,7 +332,7 @@ local GetMeasureInfo = function(Steps, chartString)
 		end
 	end
 
-	return notesPerMeasure, peakNPS, NPSperMeasure
+	return notesPerMeasure, peakNPS, NPSperMeasure, PeakSubdiv
 end
 -- ----------------------------------------------------------------
 
